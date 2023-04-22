@@ -1,0 +1,29 @@
+DayOfWeek - 1 (Monday) to 7 (Sunday)
+Date - DD/MM/YYYY
+DepTime - actual departure time (local, hhmm)
+ArrTime - actual arrival time (local, hhmm)
+CRSArrTime - scheduled arrival time (local, hhmm)
+UniqueCarrier - Airline ID
+Airline - Airline halt
+FlightNum - Flugnummer
+TailNum - Plane tail number (ID)
+ActualElapsedTime - Minuten in der Luft (inkl. TaxiIn und TaxiOut)
+CRSElapsedTime - CRS berechnete Flugzeit
+AirTime - Flugzeit in Minuten
+ArrDelay - Unterschied geplanter und tatsächlicher Ankunftszeit in Minuten
+DepDelay - ?
+Origin - IATA Flughafencode
+Org_Airport - Flughafenname
+Dest - IATA Flughafencode
+Dest_Airport - Flughafenname
+Distance - Distanz in Meilen
+TaxiIn - Zeit zwischen Landung und Ankunft am Gate in Minuten
+TaxiOut - Zeit zwischen Abfahrt vom Gate und Start in Minuten
+Cancelled - Flug gestrichen?
+CancellationCode - Grund für Streichung
+Diverted - Umgeleitet? (1 = true, 0 = false)
+CarrierDelay - Verspätung durch Airline (0 = false, X = Minuten)
+WeatherDelay - Verspätung durch Wetter (0 = false, X = Minuten)
+NASDelay - Verspätung durch National Airspace System (0 = false, X = Minuten)
+SecurityDelay - Verspätung durch Sicherheitsmaßnahmen (0 = false, X = Minuten)
+LateAircraftDelay - Verspätung an sich? (0 = false, X = Minuten)
