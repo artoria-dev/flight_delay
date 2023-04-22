@@ -4,26 +4,26 @@ DepTime - actual departure time (local, hhmm)
 ArrTime - actual arrival time (local, hhmm)
 CRSArrTime - scheduled arrival time (local, hhmm)
 UniqueCarrier - Airline ID
-Airline - Airline halt
-FlightNum - Flugnummer
+Airline - Well, Airline
+FlightNum - Flight number
 TailNum - Plane tail number (ID)
-ActualElapsedTime - Minuten in der Luft (inkl. TaxiIn und TaxiOut)
-CRSElapsedTime - CRS berechnete Flugzeit
-AirTime - Flugzeit in Minuten
-ArrDelay - Unterschied geplanter und tatsächlicher Ankunftszeit in Minuten
-DepDelay - ?
-Origin - IATA Flughafencode
-Org_Airport - Flughafenname
-Dest - IATA Flughafencode
-Dest_Airport - Flughafenname
-Distance - Distanz in Meilen
-TaxiIn - Zeit zwischen Landung und Ankunft am Gate in Minuten
-TaxiOut - Zeit zwischen Abfahrt vom Gate und Start in Minuten
-Cancelled - Flug gestrichen?
-CancellationCode - Grund für Streichung
-Diverted - Umgeleitet? (1 = true, 0 = false)
-CarrierDelay - Verspätung durch Airline (0 = false, X = Minuten)
-WeatherDelay - Verspätung durch Wetter (0 = false, X = Minuten)
-NASDelay - Verspätung durch National Airspace System (0 = false, X = Minuten)
-SecurityDelay - Verspätung durch Sicherheitsmaßnahmen (0 = false, X = Minuten)
-LateAircraftDelay - Verspätung an sich? (0 = false, X = Minuten)
+ActualElapsedTime - Minutes in the air (incl. TaxiIn and TaxiOut)
+CRSElapsedTime - CRS Elapsed/Calculated Time of Flight
+AirTime - Flight time in minutes
+ArrDelay - Difference in minutes between scheduled and actual arrival time
+DepDelay - Difference in minutes between scheduled and actual departure time
+Origin - IATA Airport Code
+Org_Airport - Airport Name
+Dest - IATA Airport Code
+Dest_Airport - Airport Name
+Distance - Distance in miles
+TaxiIn - Time between landing and gate arrival in minutes
+TaxiOut - Time between gate departure and takeoff in minutes
+Cancelled - Flight cancelled? (1 = true, 0 = false)
+CancellationCode - Reason for cancellation
+Diverted - 1 = true, 0 = false
+CarrierDelay - delay caused by the airline (0 = false, X = Minutes)
+WeatherDelay - delay caused by weather (0 = false, X = Minutes)
+NASDelay - delay caused by NAS (0 = false, X = Minutes)
+SecurityDelay - delay caused by security (0 = false, X = Minutes)
+LateAircraftDelay - delay caused by late aircraft (0 = false, X = Minutes)

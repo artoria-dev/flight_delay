@@ -8,7 +8,7 @@ pd.set_option('display.max_columns', 30)
 
 
 def info():
-    print(len(df), 'x', len(df.columns))  # 100000 29
+    print(len(df), 'x', len(df.columns))
     print(df.describe())
     print(df.info())
     print(df.isnull().sum())
@@ -30,19 +30,51 @@ def delay():
     print(df_delay)
 
 
+def taxi_time():
+    df_taxi = pd.DataFrame({'TaxiIn': [df['TaxiIn'].min(), df['TaxiIn'].max(), df['TaxiIn'].mean()],
+                            'TaxiOut': [df['TaxiOut'].min(), df['TaxiOut'].max(), df['TaxiOut'].mean()]})
+    df_taxi.index = ['min', 'max', 'mean']
+    print(df_taxi)
+    # -> 0.0 shouldnt be possible
+
+    print(df['TaxiIn'].value_counts()[0.0])  # 26
+    print(df['TaxiOut'].value_counts()[0.0])  # 8
+    # -> 34 planes 'teleported' from the runway to the gate
+
+
 def check_buggy_data():
     for i in range(len(df)):
-        if df['ArrDelay'][i] != df['CarrierDelay'][i] + df['WeatherDelay'][i] + df['NASDelay'][i] + df['SecurityDelay'][i] + df['LateAircraftDelay'][i]:
+        if df['ArrDelay'][i] != df['CarrierDelay'][i] + df['WeatherDelay'][i] + df['NASDelay'][i] + df['SecurityDelay'][
+            i] + df['LateAircraftDelay'][i]:
             print('Error at row', i)
+
+
+def useless_data():
+    print(df['Cancelled'].sum())  # 0
+    print(df['CancellationCode'].unique())  # N
+    print(df['Diverted'].sum())  # 0
+    # -> useless data
+
+
+def tailnum_by_mean_by_count():
+    """Group by TailNum and calculate mean and count of ArrDelay"""
+    df_tn = df.groupby('TailNum').agg({'ArrDelay': ['mean', 'count']})
+    df_tn.columns = ['mean', 'count']
+    print(df_tn)
 
 
 def test():
     pass
 
+
 def main():
     # info()
     # delay()
+    # taxi_time()
     # check_buggy_data()
+    # cancellation()
+    # useless_data()
+    # tailnum_by_mean_by_count()
     test()
 
 
