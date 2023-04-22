@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # import data
 df = pd.read_csv('Flight_delay NEU.csv')
@@ -63,6 +65,21 @@ def tailnum_by_mean_by_count():
     print(df_tn)
 
 
+def airports():
+    """Group by Origin and calculate mean and count of ArrDelay"""
+    df_airports = df.groupby('Origin').agg({'ArrDelay': ['mean', 'count']})
+    df_airports.columns = ['mean', 'count']
+    print(df_airports)
+    print(len(df_airports))  # 274
+
+
+def delay_in_deph():
+    df_delay = df[['ArrDelay', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay']]
+    corr = df_delay.corr()
+    sns.heatmap(corr, annot=True, cmap='coolwarm')
+    plt.show()
+
+
 def test():
     pass
 
@@ -75,7 +92,9 @@ def main():
     # cancellation()
     # useless_data()
     # tailnum_by_mean_by_count()
-    test()
+    # airports()
+    delay_in_deph()
+    # test()
 
 
 if __name__ == '__main__':
