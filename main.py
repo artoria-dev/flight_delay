@@ -80,8 +80,31 @@ def delay_in_deph():
     plt.show()
 
 
+def delay_by_carrier():
+    # for each carrier, calculate the count of flights and the mean of ArrDelay
+    df_carrier = df.groupby('UniqueCarrier').agg({'ArrDelay': ['mean', 'count']})
+    df_carrier.columns = ['mean', 'count']
+    print(df_carrier)
+    df_carrier = df_carrier.sort_values(by='mean')
+    # bar chart of the mean of ArrDelay for each carrier
+    df_carrier['mean'].plot(kind='bar')
+    # add line for the count of flights for each carrier
+    df_carrier['count'].plot(secondary_y=True, color='red')
+    plt.title('Mean of ArrDelay and count of flights by carrier')
+    plt.show()
+
+
+def time_of_day_by_day_of_week():
+    df_time = df.groupby(['DayOfWeek', 'DepTime']).agg({'ArrDelay': ['mean']})
+    df_time.columns = ['mean']
+    df_time = df_time.reindex(pd.MultiIndex.from_product([df_time.index.levels[0], range(0, 2400, 100)]))
+    df_time = df_time.fillna(df_time.mean())
+    sns.heatmap(df_time['mean'].unstack(), cmap='coolwarm')
+    plt.show()
+
+
 def test():
-    pass
+    print(df.columns)
 
 
 def main():
@@ -93,7 +116,9 @@ def main():
     # useless_data()
     # tailnum_by_mean_by_count()
     # airports()
-    delay_in_deph()
+    # delay_in_deph()
+    delay_by_carrier()
+    # time_of_day_by_day_of_week()
     # test()
 
 
