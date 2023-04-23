@@ -103,8 +103,15 @@ def time_of_day_by_day_of_week():
     plt.show()
 
 
+def avg_delay_per_flight_per_carrier():
+    delay_totals = df.groupby('UniqueCarrier')['ArrDelay'].agg(['sum', 'count'])
+    delay_totals['avg_delay_per_flight'] = delay_totals['sum'] / delay_totals['count']
+    delay_totals = delay_totals.sort_values(by='avg_delay_per_flight', ascending=False)
+    print(delay_totals)
+
+
 def test():
-    print(df.columns)
+    pass
 
 
 def main():
@@ -117,9 +124,9 @@ def main():
     # tailnum_by_mean_by_count()
     # airports()
     # delay_in_deph()
-    delay_by_carrier()
+    # delay_by_carrier()
     # time_of_day_by_day_of_week()
-    # test()
+    test()
 
 
 if __name__ == '__main__':
