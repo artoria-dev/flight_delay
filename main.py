@@ -301,11 +301,11 @@ def main():
     # delay_in_deph()
     # delay_by_carrier()
     # time_of_day_by_day_of_week()
-    # time_of_day_by_day_of_week_extremes_only()
+    time_of_day_by_day_of_week_extremes_only()
     # avg_delay_per_flight_per_carrier()
     # missing_airport_names()
 
-    CG_histogram()
+    # CG_histogram()
     # CG_histogram_removed_extremes()
 
     # test()
