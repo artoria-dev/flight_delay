@@ -1,7 +1,5 @@
 # Flight Delay Analysis
 
----
-
 ## Getting Started
 
 ### Necessary Packages
