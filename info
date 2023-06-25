@@ -27,3 +27,4 @@ WeatherDelay - delay caused by weather (0 = false, X = Minutes)
 NASDelay - delay caused by NAS (0 = false, X = Minutes)
 SecurityDelay - delay caused by security (0 = false, X = Minutes)
 LateAircraftDelay - delay caused by late aircraft (0 = false, X = Minutes)
+
