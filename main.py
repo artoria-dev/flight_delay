@@ -2,9 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-
-
-
+from scipy.stats import norm
 
 # import data
 df = pd.read_csv('Flight_delay NEU.csv')
@@ -156,6 +154,32 @@ def tailnum_by_mean_by_count_removed_extremes():
     plt.show()
 
 
+def tailnum_by_mean_std_comparisson():
+    df_tn = df.groupby('TailNum').agg({'ArrDelay': ['mean', 'count']})
+    df_tn.columns = ['mean', 'count']
+
+    # tmp_lst = [123, 123, 123, ...] the first entry is the amount of all tailnums with mean from 0 to 10. the second
+    # is 11 to 20 and so on.
+    tmp_lst = [0] * 100
+    for i in df_tn['mean']:
+        tmp_lst[int(i / 5)] += 1
+
+    # removing all 0s from the end
+    while tmp_lst[-1] == 0:
+        tmp_lst.pop()
+    # removing all 0s from the beginning
+    while tmp_lst[0] == 0:
+        tmp_lst.pop(0)
+
+    # plotting
+    plt.bar(range(len(tmp_lst)), tmp_lst)
+
+    plt.title('TailNum by mean')
+    plt.ylabel('count')
+    plt.xlabel('mean delay in minutes')
+    plt.show()
+
+
 def airports():
     """Group by Origin and calculate mean and count of ArrDelay"""
     df_airports = df.groupby('Origin').agg({'ArrDelay': ['mean', 'count']})
@@ -283,9 +307,48 @@ def CG_histogram_removed_extremes():
     plt.show()
 
 
+def distance_by_airport_by_amount():
+    df_distance = df.groupby(['Org_Airport', 'Dest_Airport'])['Distance'].agg(['mean', 'count'])
+    df_distance = df_distance.sort_values(by='count', ascending=False)
+    df_distance = df_distance.head(10)
+    df_distance = df_distance.sort_values(by='mean', ascending=False)
+    print(df_distance)
+
+
+def score_by_carrier():
+    # for each carrier, get the mean and count of ArrDelay and the distance
+    df_carrier = df.groupby('UniqueCarrier').agg({'ArrDelay': ['mean', 'count'], 'Distance': ['mean']})
+    # for each carrier, create a score for mean of arrdelay, count of arrdelay, and distance based on (x - min(x)) /
+    # (max(x) - min(x))
+    df_carrier['score_mean'] = (df_carrier['ArrDelay']['mean'] - df_carrier['ArrDelay']['mean'].min()) / (
+                df_carrier['ArrDelay']['mean'].max() - df_carrier['ArrDelay']['mean'].min())
+    df_carrier['score_count'] = (df_carrier['ArrDelay']['count'] - df_carrier['ArrDelay']['count'].min()) / (
+                df_carrier['ArrDelay']['count'].max() - df_carrier['ArrDelay']['count'].min())
+    df_carrier['score_distance'] = (df_carrier['Distance']['mean'] - df_carrier['Distance']['mean'].min()) / (
+                df_carrier['Distance']['mean'].max() - df_carrier['Distance']['mean'].min())
+    # create weights
+    w_mean = 0.5
+    w_count = 0.3
+    w_distance = 0.2
+    # apply the following formula combined_score = (weight1 * normalized_score1) + (weight2 * normalized_score2) +
+    # ... + (weightN * normalized_scoreN)
+    df_carrier['combined_score'] = (w_mean * df_carrier['score_mean']) + (w_count * df_carrier['score_count']) + (
+                w_distance * df_carrier['score_distance'])
+    # sort by combined score
+    df_carrier = df_carrier.sort_values(by='combined_score', ascending=True)
+    # lower score = better
+    print(df_carrier)
+
+    # plot
+    plt.bar(df_carrier.index, df_carrier['combined_score'])
+    plt.xlabel('Carrier')
+    plt.ylabel('Combined Score')
+    plt.title('Combined Score by Carrier')
+    plt.show()
+
+
 def test():
     pass
-
 
 
 def main():
@@ -297,16 +360,20 @@ def main():
     # useless_data()
     # tailnum_by_mean_by_count()
     # tailnum_by_mean_by_count_removed_extremes()
+    # tailnum_by_mean_std_comparisson()
     # airports()
     # delay_in_deph()
     # delay_by_carrier()
     # time_of_day_by_day_of_week()
-    time_of_day_by_day_of_week_extremes_only()
+    # time_of_day_by_day_of_week_extremes_only()
     # avg_delay_per_flight_per_carrier()
     # missing_airport_names()
 
     # CG_histogram()
     # CG_histogram_removed_extremes()
+
+    # distance_by_airport_by_amount()
+    score_by_carrier()
 
     # test()
 

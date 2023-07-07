@@ -1,5 +1,13 @@
 # Flight Delay Analysis
 
+Disclaimer:
+This is a university project. Given was a dataset with flight delays in the US.
+The goal was to analyse the delay. Nothing more.
+Down below is the README that covers the project and provides a short overview.
+The code used as seen in this README is also available in this repository.
+
+You may use this as you wish.
+
 ## Getting Started
 
 ### Necessary Packages
@@ -467,3 +475,79 @@ Therefore, a taxi time from 0 should **not** be possible.
 
 Sadly NOAA data is hard to access as a whole summary for the entire US is not available. I am too lazy to manually get each states/airports weather data.
 
+## Future Engineering
+
+### Evaluating Flights
+
+In order to evaluate flights I will apply a score to each flight based on the idea of [sabermetrics](https://en.wikipedia.org/wiki/Sabermetrics).
+Basically I reduce metrics to a single floating point number between 0 and 1. Due to the lack of metrics, I cannot evaluate each flight.
+Instead, I will evaluate the airlines according to the following metrics:
+
+- mean of arrDelay (arrival delay)
+- count of arrDelay
+- distance
+
+Taxi times are not considered as they are dependent on the airport and not the airline.
+
+Each value is normalized to a value between 0 and 1.
+The mean of arrDelay is normalized by the mean of all airlines.
+The count of arrDelay is normalized by the count of all airlines.
+The distance is normalized by the maximum distance of all airlines.
+
+To normalise values I can use the following formula:
+
+    (x - min(x)) / (max(x) - min(x))
+
+Now this formula only works for one metric. To consider multiple metrics I can use [Feature Scaling](https://en.wikipedia.org/wiki/Feature_scaling).
+To clarify, I will normalise each metric separately and apply weights to each metric according to their importance.
+I then calculate the combined score by summing up the weighted normalised values.
+
+    combined_score = (weight1 * normalized_score1) + (weight2 * normalized_score2) + ... + (weightN * normalized_scoreN)
+
+The only thing to take care of is that the weights sum up to 1.
+
+I don't know how to evaluate the weights. I will just use the following weights and change them if necessary:
+
+- mean of arrDelay: 0.5
+- count of arrDelay: 0.3
+- distance: 0.2
+
+The higher the score the worse the airlines' performance.
+
+Now I end up with the following plot:
+
+![](/pics/score-per-carrier.png)
+
+    # for each carrier, get the mean and count of ArrDelay and the distance
+    df_carrier = df.groupby('UniqueCarrier').agg({'ArrDelay': ['mean', 'count'], 'Distance': ['mean']})
+
+    # for each carrier, create a score for mean of arrdelay, count of arrdelay, and distance based on (x - min(x)) /
+    # (max(x) - min(x))
+    df_carrier['score_mean'] = (df_carrier['ArrDelay']['mean'] - df_carrier['ArrDelay']['mean'].min()) / (
+                df_carrier['ArrDelay']['mean'].max() - df_carrier['ArrDelay']['mean'].min())
+    df_carrier['score_count'] = (df_carrier['ArrDelay']['count'] - df_carrier['ArrDelay']['count'].min()) / (
+                df_carrier['ArrDelay']['count'].max() - df_carrier['ArrDelay']['count'].min())
+    df_carrier['score_distance'] = (df_carrier['Distance']['mean'] - df_carrier['Distance']['mean'].min()) / (
+                df_carrier['Distance']['mean'].max() - df_carrier['Distance']['mean'].min())
+
+    # create weights
+    w_mean = 0.5
+    w_count = 0.3
+    w_distance = 0.2
+
+    # combined_score = (weight1 * normalized_score1) + (weight2 * normalized_score2) + ... + (weightN * normalized_scoreN)
+    df_carrier['combined_score'] = (w_mean * df_carrier['score_mean']) + (w_count * df_carrier['score_count']) + (w_distance * df_carrier['score_distance'])
+    # sort by combined score
+    df_carrier = df_carrier.sort_values(by='combined_score', ascending=True)
+
+    # lower score = better
+    print(df_carrier)
+
+    # plot
+    plt.bar(df_carrier.index, df_carrier['combined_score'])
+    plt.xlabel('Carrier')
+    plt.ylabel('Combined Score')
+    plt.title('Combined Score by Carrier')
+    plt.show()
+
+Now we can determine the carrier "F9" as the "best" carrier and "UA" as the "worst" carrier according to the given metrics in terms of delays.
