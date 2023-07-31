@@ -475,6 +475,117 @@ Therefore, a taxi time from 0 should **not** be possible.
 
 Sadly NOAA data is hard to access as a whole summary for the entire US is not available. I am too lazy to manually get each states/airports weather data.
 
+Because of that I used a [different dataset](https://www.kaggle.com/datasets/sobhanmoosavi/us-weather-events) containing US weather data in the required time frame.
+I edited the dataset and saved it for further usage:
+
+    df_weather = pd.read_csv('weather-data.csv')
+    # drop unnecessary columns
+    columns_to_drop = ['EventId', 'EndTime(UTC)', 'TimeZone', 'AirportCode', 'LocationLat', 'LocationLng', 'City', 'County', 'State', 'ZipCode', 'Precipitation(In)']
+    columns_to_drop = list(set(columns_to_drop).intersection(df_weather.columns))
+    df_weather = df_weather.drop(columns=columns_to_drop)
+    # convert the 'StartTime(UTC)' column to pandas datetime objects
+    df_weather['StartTime(UTC)'] = pd.to_datetime(df_weather['StartTime(UTC)'])
+    # get 2022
+    df_weather = df_weather[df_weather['StartTime(UTC)'].dt.year == 2022]
+    # get jan to june
+    df_weather_filtered = df_weather[df_weather['StartTime(UTC)'].dt.month <= 6]
+    # save
+    df_weather_filtered.to_csv('weather-data-updated.csv', index=False)
+
+The new dataset consists of the columns Type, Severity, TimeOfOccurrence(UTC).
+
+The different severities are: ['Light' 'Severe' 'Moderate' 'UNK' 'Heavy' 'Other'].
+
+Since I don't know what is meant by 'UNK' or 'Other' I removed the entries with these severities.
+
+Only 13.717 entries got deleted and the dataset still contains 559.497 entries.
+
+Since there may be more than one occurrence for one day, I wanted to create a score for each day representing the severity (based on Severity) and main weather type (based on Type).
+
+I predefine severity scores:
+
+    severity_scores = {
+        'Light': 0.1,
+        'Moderate': 0.5,
+        'Severe': 0.3,
+        'Heavy': 1.0
+    }
+
+These values are rather random. Surely the higher the severity the higher the score. But I don't know how to weight the different severities. I will just go by this for now.
+
+Unleashing my code on the dataset ..
+
+    df_weather = pd.read_csv('weather-data.csv')
+    df_weather_events = pd.DataFrame(columns=['Date', 'MainWeatherEvent', 'Severity'])
+
+    severity_scores = {
+        'Light': 0.1,
+        'Moderate': 0.5,
+        'Severe': 0.3,
+        'Heavy': 1.0
+    }
+
+    # convert 'StartTime(UTC)' to datetime objects
+    df_weather['StartTime(UTC)'] = pd.to_datetime(df_weather['StartTime(UTC)'])
+    # create new df 'df_weather_events' with unique dates
+    df_weather_events['Date'] = df_weather['StartTime(UTC)'].dt.date.unique()
+    # init lists
+    main_events = []
+    cumulative_scores = []
+    # calculate the main weather event and cumulative score for each day
+    for date in df_weather_events['Date']:
+        daily_data = df_weather[df_weather['StartTime(UTC)'].dt.date == date]
+        main_event = daily_data['Type'].mode().iloc[0]
+        main_events.append(main_event)
+
+        daily_severity = daily_data['Severity'].map(severity_scores).sum()
+        cumulative_scores.append(daily_severity)
+    # assign the calculated values to 'MainWeatherEvent' and 'Severity' columns in 'df_weather_events'
+    df_weather_events['MainWeatherEvent'] = main_events
+    df_weather_events['Severity'] = cumulative_scores
+
+    print(df_weather_events)
+
+.. changes my weather data to the following ..
+
+         Date       MainWeatherEvent  Severity
+    0    2022-01-01             Rain    1582.3
+    1    2022-01-06             Snow    1232.9
+    2    2022-01-08              Fog     681.3
+    3    2022-01-21             Snow     632.3
+    4    2022-01-22             Snow     502.1
+    ..          ...              ...       ...
+    176  2022-01-13              Fog     421.1
+    177  2022-01-18             Snow     468.4
+    178  2022-03-02              Fog     427.0
+    179  2022-03-13             Snow      93.0
+    180  2022-01-12             Rain     272.1
+
+.. which is exactly what I wanted. Yay.
+
+Now all that is left is applying this data to the flights. But first, back it up!
+
+Also, since I checked for the main weather event each day, we got rid of even more weather types are left with ['Rain' 'Snow' 'Fog'].
+
+Anyhow I merged my dataframes:
+
+    # convert the 'Date' columns to pandas datetime objects
+    df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y')
+    df_weather['Date'] = pd.to_datetime(df_weather['Date'])
+    # merge the dfs based on the 'Date' column
+    merged_df = df.merge(df_weather[['Date', 'MainWeatherEvent', 'Severity']], on='Date', how='left')
+    # fill nan vals
+    merged_df['MainWeatherEvent'] = merged_df['MainWeatherEvent'].fillna('Unknown')
+    merged_df['Severity'] = merged_df['Severity'].fillna(0)
+
+Okay, now for the moment of truth. Let's check the correlation between the newly added severity and the weather delay.
+
+    print(merged_df['WeatherDelay'].corr(merged_df['Severity']))
+
+    #/> 0.007596445514655384
+
+Well. I didn't expect much, but at least more than this. I guess I won't use weather influence :(
+
 ## Future Engineering
 
 ### Evaluating Flights
