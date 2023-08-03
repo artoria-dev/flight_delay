@@ -391,29 +391,25 @@ Therefore, a taxi time from 0 should **not** be possible.
     # mean for mean and mean for count
     plt.axhline(df_tn['mean'].mean(), color='red', linestyle='--')
     plt.axvline(df_tn['count'].mean(), color='green', linestyle='--')
-    plt.text(290, df_tn['mean'].mean()+5, 'mean of mean', color='red', weight='bold')
-    plt.text(df_tn['count'].mean()+5, 100, 'mean of count', color='green', weight='bold', rotation=90)
+    plt.text(290, df_tn['mean'].mean() + 5, 'mean of mean', color='red', weight='bold')
+    plt.text(df_tn['count'].mean() + 5, 100, 'mean of count', color='green', weight='bold', rotation=90)
 
     # average max and min delay
-    plt.axhline(df_tn['mean'].mean()+df_tn['mean'].std(), color='red', linestyle='--')
-    plt.axhline(df_tn['mean'].mean()-df_tn['mean'].std(), color='red', linestyle='--')
-    plt.text(290, df_tn['mean'].mean()+df_tn['mean'].std()+5, 'mean+std', color='red', weight='bold')
-    plt.text(290, df_tn['mean'].mean()-df_tn['mean'].std()+5, 'mean-std', color='red', weight='bold')
+    plt.axhline(df_tn['mean'].mean() + df_tn['mean'].std(), color='red', linestyle='--')
+    plt.axhline(df_tn['mean'].mean() - df_tn['mean'].std(), color='red', linestyle='--')
+    plt.text(290, df_tn['mean'].mean() + df_tn['mean'].std() + 5, 'mean+std', color='red', weight='bold')
+    plt.text(290, df_tn['mean'].mean() - df_tn['mean'].std() + 5, 'mean-std', color='red', weight='bold')
 
     # average max and min count
-    plt.axvline(df_tn['count'].mean()+df_tn['count'].std(), color='green', linestyle='--')
-    plt.axvline(df_tn['count'].mean()-df_tn['count'].std(), color='green', linestyle='--')
-    plt.text(df_tn['count'].mean()+df_tn['count'].std()+5, 100, 'mean+std', color='green', weight='bold', rotation=90)
-    plt.text(df_tn['count'].mean()-df_tn['count'].std()+5, 100, 'mean-std', color='green', weight='bold', rotation=90)
-
-    # top right corner text
-    plt.text(250, 130, 'mean of mean: ' + str(round(df_tn['mean'].mean(), 2)), color='red')
-    plt.text(250, 125, 'std of mean: ' + str(round(df_tn['mean'].std(), 2)), color='red')
-    plt.text(250, 115, 'mean of count: ' + str(round(df_tn['count'].mean(), 2)), color='green')
-    plt.text(250, 110, 'std of count: ' + str(round(df_tn['count'].std(), 2)), color='green')
+    plt.axvline(df_tn['count'].mean() + df_tn['count'].std(), color='green', linestyle='--')
+    plt.axvline(df_tn['count'].mean() - df_tn['count'].std(), color='green', linestyle='--')
+    plt.text(df_tn['count'].mean() + df_tn['count'].std() + 5, 100, 'mean+std', color='green', weight='bold',
+             rotation=90)
+    plt.text(df_tn['count'].mean() - df_tn['count'].std() + 5, 100, 'mean-std', color='green', weight='bold',
+             rotation=90)
 
     plt.title('TailNum by mean by count (count>11)')
-
+    plt.legend(['TailNums', 'Duration', 'Count'])
     plt.show()
 
 Okay. Since one doesn't get any information out of this, I present you the bell curve of the mean (the duration) and the count.
