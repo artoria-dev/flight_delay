@@ -416,6 +416,80 @@ Therefore, a taxi time from 0 should **not** be possible.
 
     plt.show()
 
+Okay. Since one doesn't get any information out of this, I present you the bell curve of the mean (the duration) and the count.
+
+Duration:
+
+![](/pics/bell_curve_delay-duration.png)
+
+Count:
+
+![](/pics/bell_curve_delay-count.png)
+
+The code for them is the same:
+
+    df_bc = df.groupby('TailNum').agg({'ArrDelay': ['mean', 'count']})
+    df_bc.columns = ['mean', 'count']
+    df_bc = df_bc[df_bc['count'] > 11]
+
+    mean = df_bc['count'].mean()
+    median = df_bc['count'].median()
+    std = df_bc['count'].std()
+
+    # create wider figure
+    plt.figure(figsize=(12, 6))
+
+    # bell curve
+    x = np.linspace(mean - 4 * std, mean + 4 * std, 100)
+    y = norm.pdf(x, mean, std)
+
+    # calc y-coords for each label
+    max_y = y.max()
+    percentage_y = max_y * 0.12  # if want to adjust y-level
+
+    # histogram
+    plt.hist(df_bc['count'], bins=30, density=True, alpha=0.6)
+    plt.plot(x, y)
+
+    # vertical lines for mean, median, and standard deviation
+    plt.axvline(mean, color='red', linestyle='-', label='mean')
+    plt.axvline(median, color='green', linestyle='--', label='median')
+    plt.axvline(mean + std, color='blue', linestyle='-.', label='-1 std')
+    plt.axvline(mean - std, color='blue', linestyle='-.', label='+1 std')
+    plt.axvline(mean + 2 * std, color='green', linestyle='-.', label='-2 std')
+    plt.axvline(mean - 2 * std, color='green', linestyle='-.', label='+2 std')
+    plt.axvline(mean + 3 * std, color='purple', linestyle='-.', label='-3 std')
+    plt.axvline(mean - 3 * std, color='purple', linestyle='-.', label='+3 std')
+
+    # percentages
+    plt.text(mean + 15, percentage_y, f'50%', color='red', ha='center', va='bottom')
+    plt.text((mean + std) + 15, percentage_y, f'68%', color='blue', ha='center', va='bottom')
+    plt.text((mean - std) + 15, percentage_y, f'68%', color='blue', ha='center', va='bottom')
+    plt.text((mean + 2 * std) + 15, percentage_y, f'95%', color='green', ha='center', va='bottom')
+    plt.text((mean - 2 * std) + 15, percentage_y, f'95%', color='green', ha='center', va='bottom')
+    plt.text((mean + 3 * std) + 15, percentage_y, f'99.7%', color='purple', ha='center', va='bottom')
+    plt.text((mean - 3 * std) + 15, percentage_y, f'99.7%', color='purple', ha='center', va='bottom')
+
+    # additional labels
+    plt.text((mean + std) + 15, percentage_y - max_y * 0.05, f'±1σ', color='blue', ha='center', va='bottom')
+    plt.text((mean - std) + 15, percentage_y - max_y * 0.05, f'±1σ', color='blue', ha='center', va='bottom')
+    plt.text((mean + 2 * std) + 15, percentage_y - max_y * 0.05, f'±2σ', color='green', ha='center', va='bottom')
+    plt.text((mean - 2 * std) + 15, percentage_y - max_y * 0.05, f'±2σ', color='green', ha='center', va='bottom')
+    plt.text((mean + 3 * std) + 15, percentage_y - max_y * 0.05, f'±3σ', color='purple', ha='center', va='bottom')
+    plt.text((mean - 3 * std) + 15, percentage_y - max_y * 0.05, f'±3σ', color='purple', ha='center', va='bottom')
+
+    plt.legend()
+
+    # show mean and std on plot
+    plt.text(mean + 30, max_y * 0.95, rf'$\mathbf{{Mean: {mean:.2f}}}$', color='black', ha='center', rotation=20)
+    plt.text(mean + std + 30, max_y * 0.95, rf'$\mathbf{{Std: {std:.2f}}}$', color='black', ha='center', rotation=20)
+
+    plt.title('Bell Curve of Arrival Delay Count')
+    plt.xlabel('Occurrences of Arrival Delay')
+    plt.ylabel('Frequency')
+
+    plt.show()
+
 
 ### Analyze temporal patterns
 
